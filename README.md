@@ -30,6 +30,8 @@ Plan for the iCloud part:
 - The copy on the device stays the source of truth: the app never waits for iCloud.
 - `SaveStore` gets an optional cloud mirror. Every save is written on the device, then to iCloud. At startup, and whenever iCloud reports a change from another device, the two copies are merged.
 - Each app gives a merge rule per save (for example "keep the copy with the most progress"). The default keeps the most recently written copy.
+- It needs a small iOS-only native part over `NSUbiquitousKeyValueStore`. That means either app_core becomes a Flutter plugin package with Swift code, or it uses a well-maintained pub.dev plugin if one exists.
+- Each app must have the **iCloud** capability with **Key-value storage** on its App ID. That requires the paid Apple Developer Program (free Personal Teams can't use iCloud), so this part can only be tested after enrolling.
 - Wallet balances (coins) are an edge case decided per app, not by app_core. See below.
 
 ### Edge case: wallet balances (coins, hints…)
@@ -43,14 +45,13 @@ Balances don't sync cleanly, whatever the method:
 So each app decides whether its wallet is synced, and with which merge rule. The design rule that keeps any mistake harmless: **coins buy only ephemeral benefits** (revives, continues, a hint for the current level). They never buy persistent perks or unlocks. Anything permanent is either a non-consumable purchase, which the store always restores, or progress earned in play and kept in `SaveStore`. A bad merge then costs a player a few revives at most, never something they paid to keep.
 
 The template follows this: coins pay for a "Continue" after a game over, and the permanent extra life is the non-consumable `premium`.
-- It needs a small iOS-only native part over `NSUbiquitousKeyValueStore`. That means either app_core becomes a Flutter plugin package with Swift code, or it uses a well-maintained pub.dev plugin if one exists.
-- Each app must have the **iCloud** capability with **Key-value storage** on its App ID. That requires the paid Apple Developer Program (free Personal Teams can't use iCloud), so this part can only be tested after enrolling.
 
 ## Releasing a change
 
 ```bash
 flutter test
 git commit -am "Describe the change"
+git push                              # CI runs analyze + tests; wait for it to pass
 git tag v0.2.0 && git push --tags
 ```
 
