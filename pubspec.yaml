@@ -1,6 +1,6 @@
 name: app_core
 description: Shared building blocks for every app (purchases, persistence, settings, audio, review prompt, store and settings screens).
-version: 0.1.0
+version: 0.1.2
 publish_to: none
 
 environment:

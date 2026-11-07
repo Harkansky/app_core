@@ -50,6 +50,7 @@ The template follows this: coins pay for a "Continue" after a game over, and the
 
 ```bash
 flutter test
+# set version: in pubspec.yaml to the tag you are about to create (0.2.0 for v0.2.0)
 git commit -am "Describe the change"
 git push                              # CI runs analyze + tests; wait for it to pass
 git tag v0.2.0 && git push --tags
