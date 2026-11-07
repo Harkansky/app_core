@@ -16,8 +16,8 @@ class StorePurchaseService extends PurchaseService {
   StorePurchaseService({
     required super.specs,
     required super.entitlements,
-    required KeyValueStore store,
-  }) : _store = store;
+    required this._store,
+  });
 
   static const _deliveredKey = 'core.iap.delivered';
   static const _maxDeliveredIds = 200;
