@@ -33,6 +33,7 @@ Plan for the iCloud part:
 - It needs a small iOS-only native part over `NSUbiquitousKeyValueStore`. That means either app_core becomes a Flutter plugin package with Swift code, or it uses a well-maintained pub.dev plugin if one exists.
 - Each app must have the **iCloud** capability with **Key-value storage** on its App ID. That requires the paid Apple Developer Program (free Personal Teams can't use iCloud), so this part can only be tested after enrolling.
 - Wallet balances (coins) are an edge case decided per app, not by app_core. See below.
+- When it ships, update the iPhone lines in `apps_site/_app-template/` (privacy and support pages) and in each live app's pages: today they describe device backups only.
 
 ### Edge case: wallet balances (coins, hints…)
 
