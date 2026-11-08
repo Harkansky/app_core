@@ -8,6 +8,7 @@
 /// ```
 library;
 
+export 'src/ads/rewarded_ads.dart';
 export 'src/audio/audio_controller.dart';
 export 'src/config/core_config.dart';
 export 'src/core_services.dart';

@@ -6,12 +6,13 @@ Shared code every app depends on. Fix a bug here once, tag a release, and every 
 |---|---|
 | `CoreServices` / `CoreScope` | One object holding everything below, created in `main()` and reachable with `CoreServices.of(context)` |
 | Purchases | `PurchaseService` over the official `in_app_purchase` plugin (StoreKit / Play Billing), plus a fake store for debug builds and tests |
+| `RewardedAds` | Contract for "watch an ad to continue": `isReady`, `show()`, ad privacy options. No ads SDK here; defaults to `RewardedAds.none()`, `FakeRewardedAds` for debug builds and tests. `CoreServices.showRewardedAd()` pauses the music around the ad |
 | `Entitlements` | Offline cache of owned products and wallet balances (coins, hints…) |
 | `SaveStore` | Versioned JSON save data with migrations, stored on the device (see "Account sync") |
 | `SettingsController` | Sound, music, vibration toggles |
-| `AudioController` | SFX pool, looping music, haptics, all honoring settings |
+| `AudioController` | SFX pool, looping music (with pause/resume), haptics, all honoring settings |
 | `ReviewPrompter` | Native "rate this app" prompt after N good moments, once |
-| `StoreScreen`, `SettingsScreen` | Drop-in screens (restore purchases, privacy policy, support email, about) |
+| `StoreScreen`, `SettingsScreen` | Drop-in screens (restore purchases, privacy policy, ad privacy settings when required, support email, about) |
 
 ## Account sync
 
@@ -64,6 +65,7 @@ Keep this repo **public** (it holds no secrets) so app CI can fetch it without t
 ## Not included on purpose
 
 - **Receipt validation server.** Fine for cheap unlocks. If you ever sell something expensive or account-based, add server validation or RevenueCat behind `PurchaseService`.
-- **Ads, analytics, app accounts.** Each one adds privacy-label and consent work. Add them per app only when needed.
+- **Analytics, app accounts.** Each one adds privacy-label and consent work. Add them per app only when needed.
+- **An ads SDK.** app_core only defines the `RewardedAds` contract; the AdMob code comes from the separate `app_ads` package, so apps with ads turned off carry nothing.
 - **Live sync on Android** (Play Games saved games). It needs setup in Play Console for each app and a Play Games profile for the player, and it adds items to the Data safety form. Add it per app if the daily Google backup isn't enough.
 - **Localization.** Strings are English for now; move them to `flutter_localizations` when the first app ships in French.

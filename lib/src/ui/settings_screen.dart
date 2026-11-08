@@ -4,8 +4,8 @@ import '../core_services.dart';
 import 'links.dart';
 
 /// Ready-made settings page: sound, music, vibration, restore purchases,
-/// privacy policy, support contact and About. Add app-specific rows with
-/// [extraTiles].
+/// privacy policy, ad privacy choices (only when the ad network requires
+/// them), support contact and About. Add app-specific rows with [extraTiles].
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key, this.extraTiles = const []});
 
@@ -20,7 +20,7 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListenableBuilder(
-        listenable: settings,
+        listenable: Listenable.merge([settings, core.ads]),
         builder: (context, child) => ListView(
           children: [
             SwitchListTile(
@@ -64,6 +64,13 @@ class SettingsScreen extends StatelessWidget {
                 leading: const Icon(Icons.privacy_tip_outlined),
                 title: const Text('Privacy policy'),
                 onTap: () => openWebPage(url),
+              ),
+            if (core.ads.privacyOptionsRequired)
+              ListTile(
+                leading: const Icon(Icons.shield_outlined),
+                title: const Text('Privacy settings'),
+                subtitle: const Text('Ad choices'),
+                onTap: core.ads.showPrivacyOptions,
               ),
             if (config.supportEmail case final email?)
               ListTile(
