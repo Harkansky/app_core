@@ -4,7 +4,10 @@ import 'package:url_launcher/url_launcher.dart';
 /// Opens a web page in the system browser.
 Future<bool> openWebPage(String url) async {
   try {
-    return await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    return await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
   } catch (error) {
     debugPrint('[app_core] Could not open $url: $error');
     return false;

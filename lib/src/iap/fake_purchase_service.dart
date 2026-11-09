@@ -1,3 +1,6 @@
+import 'dart:ui' show Locale, PlatformDispatcher;
+
+import 'currency.dart';
 import 'purchase_service.dart';
 import 'product_spec.dart';
 
@@ -11,9 +14,23 @@ class FakePurchaseService extends PurchaseService {
     required super.specs,
     required super.entitlements,
     this.delay = const Duration(milliseconds: 300),
+    this.defaultCurrency = 'USD',
+    this._locale,
   });
 
   final Duration delay;
+
+  /// Currency used outside the regions listed in `currencyForRegion`.
+  final String defaultCurrency;
+
+  /// Device locale: picks the currency (region) and the price format.
+  final Locale? _locale;
+
+  /// Currency the prices are shown in, e.g. 'EUR' on a French device.
+  String get currency => currencyForRegion(
+    (_locale ?? PlatformDispatcher.instance.locale).countryCode,
+    fallback: defaultCurrency,
+  );
 
   @override
   bool get isFake => true;
@@ -29,7 +46,7 @@ class FakePurchaseService extends PurchaseService {
             spec: spec,
             title: spec.fallbackTitle,
             description: spec.fallbackDescription,
-            price: spec.debugPrice,
+            price: _price(spec),
           ),
       ],
     );
@@ -39,7 +56,10 @@ class FakePurchaseService extends PurchaseService {
   Future<bool> buy(String productId) async {
     final spec = specOf(productId);
     if (spec == null) {
-      setState(error: 'Unknown product: $productId');
+      setState(
+        error: 'Unknown product: $productId',
+        errorKind: PurchaseErrorKind.unavailable,
+      );
       return false;
     }
     if (spec.kind == ProductKind.nonConsumable && entitlements.owns(spec.id)) {
@@ -56,5 +76,17 @@ class FakePurchaseService extends PurchaseService {
   Future<void> restore() async {
     // Nothing to do: the fake store has no account to restore from.
     notifyListeners();
+  }
+
+  String _price(ProductSpec spec) {
+    final locale = (_locale ?? PlatformDispatcher.instance.locale).toString();
+    var code = currency;
+    var amount = spec.debugPrices[code];
+    if (amount == null) {
+      code = defaultCurrency;
+      amount = spec.debugPrices[code] ?? spec.debugPrices.values.firstOrNull;
+    }
+    if (amount == null) return '';
+    return formatPrice(amount, code, locale);
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core_services.dart';
+import '../l10n/core_localizations.dart';
 import 'links.dart';
 
 /// Ready-made settings page: sound, music, vibration, restore purchases,
@@ -16,28 +17,32 @@ class SettingsScreen extends StatelessWidget {
     final core = CoreServices.of(context);
     final settings = core.settings;
     final config = core.config;
+    final l10n = CoreLocalizations.of(context);
+    final privacyUrl = config.privacyPolicyUrlFor(
+      Localizations.localeOf(context),
+    );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(l10n.settingsTitle)),
       body: ListenableBuilder(
         listenable: Listenable.merge([settings, core.ads]),
         builder: (context, child) => ListView(
           children: [
             SwitchListTile(
               secondary: const Icon(Icons.volume_up_outlined),
-              title: const Text('Sound effects'),
+              title: Text(l10n.soundEffects),
               value: settings.soundOn,
               onChanged: settings.setSoundOn,
             ),
             SwitchListTile(
               secondary: const Icon(Icons.music_note_outlined),
-              title: const Text('Music'),
+              title: Text(l10n.music),
               value: settings.musicOn,
               onChanged: settings.setMusicOn,
             ),
             SwitchListTile(
               secondary: const Icon(Icons.vibration),
-              title: const Text('Vibration'),
+              title: Text(l10n.vibration),
               value: settings.hapticsOn,
               onChanged: settings.setHapticsOn,
             ),
@@ -45,42 +50,38 @@ class SettingsScreen extends StatelessWidget {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.restore),
-              title: const Text('Restore purchases'),
+              title: Text(l10n.restorePurchases),
               onTap: () async {
                 await core.purchases.restore();
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Restore requested. Items you own will reappear in a moment.',
-                      ),
-                    ),
+                    SnackBar(content: Text(l10n.restoreRequested)),
                   );
                 }
               },
             ),
-            if (config.privacyPolicyUrl case final url?)
+            if (privacyUrl case final url?)
               ListTile(
                 leading: const Icon(Icons.privacy_tip_outlined),
-                title: const Text('Privacy policy'),
+                title: Text(l10n.privacyPolicy),
                 onTap: () => openWebPage(url),
               ),
             if (core.ads.privacyOptionsRequired)
               ListTile(
                 leading: const Icon(Icons.shield_outlined),
-                title: const Text('Privacy settings'),
-                subtitle: const Text('Ad choices'),
+                title: Text(l10n.privacySettings),
+                subtitle: Text(l10n.adChoices),
                 onTap: core.ads.showPrivacyOptions,
               ),
             if (config.supportEmail case final email?)
               ListTile(
                 leading: const Icon(Icons.mail_outline),
-                title: const Text('Contact support'),
+                title: Text(l10n.contactSupport),
                 onTap: () => openSupportEmail(email, subject: config.appName),
               ),
             ListTile(
               leading: const Icon(Icons.info_outline),
-              title: const Text('About'),
+              title: Text(l10n.about),
               onTap: () => showAboutDialog(
                 context: context,
                 applicationName: config.appName,

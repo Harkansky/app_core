@@ -1,0 +1,9 @@
+# Strings of app_core's screens (Store, Settings). Run `flutter gen-l10n`
+# after editing the .arb files; the generated Dart files are committed (CI
+# checks they're up to date). Apps add CoreLocalizations.delegate to
+# MaterialApp.localizationsDelegates.
+arb-dir: lib/src/l10n
+template-arb-file: core_en.arb
+output-localization-file: core_localizations.dart
+output-class: CoreLocalizations
+nullable-getter: false

@@ -27,5 +27,9 @@ jobs:
           cache: true
 
       - run: flutter pub get
+      - name: Generated translations are up to date
+        run: |
+          flutter gen-l10n
+          git diff --exit-code lib/src/l10n
       - run: flutter analyze --no-fatal-infos
       - run: flutter test

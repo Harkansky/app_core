@@ -50,6 +50,7 @@ class CoreServices {
       store: kv,
       forceFake: fakePurchases,
       fakeDelay: fakePurchaseDelay,
+      defaultCurrency: config.defaultCurrency,
     );
     unawaited(purchases.init());
     final rewardedAds = ads ?? RewardedAds.none();
@@ -78,7 +79,10 @@ class CoreServices {
 
   static CoreServices of(BuildContext context) {
     final scope = context.dependOnInheritedWidgetOfExactType<CoreScope>();
-    assert(scope != null, 'No CoreScope above this widget. Wrap your app in CoreScope.');
+    assert(
+      scope != null,
+      'No CoreScope above this widget. Wrap your app in CoreScope.',
+    );
     return scope!.services;
   }
 
@@ -111,5 +115,6 @@ class CoreScope extends InheritedWidget {
   final CoreServices services;
 
   @override
-  bool updateShouldNotify(CoreScope oldWidget) => services != oldWidget.services;
+  bool updateShouldNotify(CoreScope oldWidget) =>
+      services != oldWidget.services;
 }

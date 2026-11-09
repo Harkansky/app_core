@@ -1,0 +1,22 @@
+{
+  "@@locale": "en",
+  "storeTitle": "Store",
+  "storeTestBanner": "Test store: purchases are free and only saved on this device.",
+  "storeEmpty": "Nothing for sale yet.",
+  "restorePurchases": "Restore purchases",
+  "storeUnavailable": "The store is unavailable right now. Everything you already own keeps working offline.",
+  "tryAgain": "Try again",
+  "dismiss": "Dismiss",
+  "errorUnavailable": "This item isn't available right now.",
+  "errorFailed": "The purchase didn't go through. Please try again.",
+  "settingsTitle": "Settings",
+  "soundEffects": "Sound effects",
+  "music": "Music",
+  "vibration": "Vibration",
+  "restoreRequested": "Restore requested. Items you own will reappear in a moment.",
+  "privacyPolicy": "Privacy policy",
+  "privacySettings": "Privacy settings",
+  "adChoices": "Ad choices",
+  "contactSupport": "Contact support",
+  "about": "About"
+}

@@ -33,7 +33,8 @@ class StorePurchaseService extends PurchaseService {
     // redelivered as soon as the stream has a listener.
     _subscription ??= _iap.purchaseStream.listen(
       _onPurchases,
-      onError: (Object error) => setState(error: '$error'),
+      onError: (Object error) =>
+          setState(error: '$error', errorKind: PurchaseErrorKind.failed),
     );
 
     try {
@@ -43,20 +44,26 @@ class StorePurchaseService extends PurchaseService {
         return;
       }
 
-      final response =
-          await _iap.queryProductDetails(specs.map((s) => s.id).toSet());
+      final response = await _iap.queryProductDetails(
+        specs.map((s) => s.id).toSet(),
+      );
       for (final details in response.productDetails) {
         _details[details.id] = details;
       }
       if (response.notFoundIDs.isNotEmpty) {
-        debugPrint('[app_core] Products missing from the store: '
-            '${response.notFoundIDs.join(', ')}');
+        debugPrint(
+          '[app_core] Products missing from the store: '
+          '${response.notFoundIDs.join(', ')}',
+        );
       }
 
       setState(
         ready: true,
         available: true,
         error: response.error?.message,
+        errorKind: response.error == null
+            ? null
+            : PurchaseErrorKind.unavailable,
         items: [
           for (final spec in specs)
             if (_details[spec.id] case final details?)
@@ -65,11 +72,17 @@ class StorePurchaseService extends PurchaseService {
                 title: _cleanTitle(details.title),
                 description: details.description,
                 price: details.price,
+                fromStore: true,
               ),
         ],
       );
     } catch (error) {
-      setState(ready: true, available: false, error: '$error');
+      setState(
+        ready: true,
+        available: false,
+        error: '$error',
+        errorKind: PurchaseErrorKind.unavailable,
+      );
       return;
     }
 
@@ -93,7 +106,10 @@ class StorePurchaseService extends PurchaseService {
     final spec = specOf(productId);
     final details = _details[productId];
     if (spec == null || details == null) {
-      setState(error: 'This item is not available right now.');
+      setState(
+        error: 'Not available: $productId',
+        errorKind: PurchaseErrorKind.unavailable,
+      );
       return false;
     }
 
@@ -107,7 +123,7 @@ class StorePurchaseService extends PurchaseService {
       return started;
     } catch (error) {
       clearPending(productId);
-      setState(error: '$error');
+      setState(error: '$error', errorKind: PurchaseErrorKind.failed);
       return false;
     }
   }
@@ -117,7 +133,7 @@ class StorePurchaseService extends PurchaseService {
     try {
       await _iap.restorePurchases();
     } catch (error) {
-      setState(error: '$error');
+      setState(error: '$error', errorKind: PurchaseErrorKind.failed);
     }
   }
 
@@ -132,7 +148,7 @@ class StorePurchaseService extends PurchaseService {
           if (spec != null) {
             final restoredConsumable =
                 purchase.status == PurchaseStatus.restored &&
-                    spec.kind == ProductKind.consumable;
+                spec.kind == ProductKind.consumable;
             if (!restoredConsumable) {
               await _deliver(purchase, spec);
             } else if (_isAndroid) {
@@ -147,7 +163,10 @@ class StorePurchaseService extends PurchaseService {
           clearPending(purchase.productID);
         case PurchaseStatus.error:
           clearPending(purchase.productID);
-          setState(error: purchase.error?.message ?? 'The purchase failed.');
+          setState(
+            error: purchase.error?.message ?? 'Purchase failed',
+            errorKind: PurchaseErrorKind.failed,
+          );
         case PurchaseStatus.canceled:
           clearPending(purchase.productID);
       }
@@ -182,8 +201,8 @@ class StorePurchaseService extends PurchaseService {
 
   Future<void> _consumeOnAndroid(PurchaseDetails purchase) async {
     try {
-      final android =
-          _iap.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+      final android = _iap
+          .getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
       await android.consumePurchase(purchase);
     } catch (error) {
       debugPrint('[app_core] Could not consume ${purchase.productID}: $error');

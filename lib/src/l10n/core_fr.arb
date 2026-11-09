@@ -1,0 +1,22 @@
+{
+  "@@locale": "fr",
+  "storeTitle": "Boutique",
+  "storeTestBanner": "Boutique de test : les achats sont gratuits et enregistrés uniquement sur cet appareil.",
+  "storeEmpty": "Rien à vendre pour le moment.",
+  "restorePurchases": "Restaurer les achats",
+  "storeUnavailable": "La boutique est indisponible pour le moment. Tout ce que vous possédez déjà continue de fonctionner hors ligne.",
+  "tryAgain": "Réessayer",
+  "dismiss": "Fermer",
+  "errorUnavailable": "Cet article n'est pas disponible pour le moment.",
+  "errorFailed": "L'achat n'a pas abouti. Veuillez réessayer.",
+  "settingsTitle": "Paramètres",
+  "soundEffects": "Effets sonores",
+  "music": "Musique",
+  "vibration": "Vibrations",
+  "restoreRequested": "Restauration demandée. Vos achats réapparaîtront dans un instant.",
+  "privacyPolicy": "Politique de confidentialité",
+  "privacySettings": "Paramètres de confidentialité",
+  "adChoices": "Choix publicitaires",
+  "contactSupport": "Contacter l'assistance",
+  "about": "À propos"
+}

@@ -6,6 +6,16 @@ import 'fake_purchase_service.dart';
 import 'product_spec.dart';
 import 'store_purchase_service.dart';
 
+/// What went wrong with the store, for a translated message. The raw
+/// platform text stays in [PurchaseService.lastError] for logs.
+enum PurchaseErrorKind {
+  /// The product or the store can't be reached right now.
+  unavailable,
+
+  /// A purchase was started but didn't complete.
+  failed,
+}
+
 /// The one interface apps use for in-app purchases.
 ///
 /// Purchases are delivered into [Entitlements]; listen to this object for
@@ -21,8 +31,10 @@ abstract class PurchaseService extends ChangeNotifier {
     required KeyValueStore store,
     bool forceFake = false,
     Duration fakeDelay = const Duration(milliseconds: 300),
+    String defaultCurrency = 'USD',
   }) {
-    final supported = !kIsWeb &&
+    final supported =
+        !kIsWeb &&
         (defaultTargetPlatform == TargetPlatform.android ||
             defaultTargetPlatform == TargetPlatform.iOS);
     if (forceFake || !supported) {
@@ -30,6 +42,7 @@ abstract class PurchaseService extends ChangeNotifier {
         specs: specs,
         entitlements: entitlements,
         delay: fakeDelay,
+        defaultCurrency: defaultCurrency,
       );
     }
     return StorePurchaseService(
@@ -47,6 +60,7 @@ abstract class PurchaseService extends ChangeNotifier {
   List<StoreItem> _items = const [];
   final Set<String> _pending = {};
   String? _lastError;
+  PurchaseErrorKind? _errorKind;
 
   /// True once [init] finished (successfully or not).
   bool get isReady => _ready;
@@ -60,7 +74,12 @@ abstract class PurchaseService extends ChangeNotifier {
 
   List<StoreItem> get items => _items;
   Set<String> get pending => Set.unmodifiable(_pending);
+
+  /// Raw error text (platform message), for logs.
   String? get lastError => _lastError;
+
+  /// Kind of the last error, for a translated message; null when none.
+  PurchaseErrorKind? get errorKind => _errorKind;
 
   /// Connects to the store and loads product details. Safe to call again
   /// (e.g. a "Retry" button after being offline).
@@ -74,8 +93,9 @@ abstract class PurchaseService extends ChangeNotifier {
   Future<void> restore();
 
   void clearError() {
-    if (_lastError == null) return;
+    if (_lastError == null && _errorKind == null) return;
     _lastError = null;
+    _errorKind = null;
     notifyListeners();
   }
 
@@ -92,11 +112,15 @@ abstract class PurchaseService extends ChangeNotifier {
     bool? available,
     List<StoreItem>? items,
     String? error,
+    PurchaseErrorKind? errorKind,
   }) {
     if (ready != null) _ready = ready;
     if (available != null) _available = available;
     if (items != null) _items = List.unmodifiable(items);
-    if (error != null) _lastError = error;
+    if (error != null || errorKind != null) {
+      _lastError = error;
+      _errorKind = errorKind ?? PurchaseErrorKind.failed;
+    }
     notifyListeners();
   }
 

@@ -12,6 +12,8 @@ Shared code every app depends on. Fix a bug here once, tag a release, and every 
 | `SettingsController` | Sound, music, vibration toggles |
 | `AudioController` | SFX pool, looping music (with pause/resume), haptics, all honoring settings |
 | `ReviewPrompter` | Native "rate this app" prompt after N good moments, once |
+| `CoreLocalizations` | English and French texts of the store and settings screens (add `CoreLocalizations.delegate` to the app's `MaterialApp`) |
+| Currencies | The fake store shows each product's `debugPrices` in the device region's currency (EUR in the euro area, USD elsewhere), formatted for the device language. Real stores already return prices in the player's currency |
 | `StoreScreen`, `SettingsScreen` | Drop-in screens (restore purchases, privacy policy, ad privacy settings when required, support email, about) |
 
 ## Account sync
@@ -48,6 +50,12 @@ So each app decides whether its wallet is synced, and with which merge rule. The
 
 The template follows this: coins pay for a "Continue" after a game over, and the permanent extra life is the non-consumable `premium`.
 
+## Languages
+
+Texts live in `lib/src/l10n/core_<lang>.arb` (English is the reference). After editing them, run `flutter gen-l10n` and commit the generated Dart files: apps can't generate them for a dependency, and CI fails if they're stale. A test checks every language has the same keys as English.
+
+To add a language: copy `core_en.arb` to `core_<lang>.arb`, translate, run `flutter gen-l10n`. To add a currency: add its region rule to `currencyForRegion` (`lib/src/iap/currency.dart`) and a price for it in each product's `debugPrices`.
+
 ## Releasing a change
 
 ```bash
@@ -68,4 +76,3 @@ Keep this repo **public** (it holds no secrets) so app CI can fetch it without t
 - **Analytics, app accounts.** Each one adds privacy-label and consent work. Add them per app only when needed.
 - **An ads SDK.** app_core only defines the `RewardedAds` contract; the AdMob code comes from the separate `app_ads` package, so apps with ads turned off carry nothing.
 - **Live sync on Android** (Play Games saved games). It needs setup in Play Console for each app and a Play Games profile for the player, and it adds items to the Data safety form. Add it per app if the daily Google backup isn't enough.
-- **Localization.** Strings are English for now; move them to `flutter_localizations` when the first app ships in French.

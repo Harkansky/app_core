@@ -1,6 +1,6 @@
 name: app_core
 description: Shared building blocks for every app (purchases, rewarded-ads contract, persistence, settings, audio, review prompt, store and settings screens).
-version: 0.2.0
+version: 0.3.0
 publish_to: none
 
 environment:
@@ -11,6 +11,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
   audioplayers: ^6.1.0
   in_app_purchase: ^3.2.0
   # Direct access to Play Billing's consume call (see StorePurchaseService).
@@ -23,3 +26,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+
+flutter:
+  # Generates CoreLocalizations from lib/src/l10n/*.arb (see l10n.yaml).
+  generate: true

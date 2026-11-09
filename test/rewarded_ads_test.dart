@@ -117,7 +117,11 @@ void main() {
         tester.pumpWidget(
           CoreScope(
             services: core,
-            child: const MaterialApp(home: SettingsScreen()),
+            child: const MaterialApp(
+              localizationsDelegates: CoreLocalizations.localizationsDelegates,
+              supportedLocales: CoreLocalizations.supportedLocales,
+              home: SettingsScreen(),
+            ),
           ),
         );
 

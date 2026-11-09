@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'key_value_store.dart';
 
 /// Upgrades save data from version `n` to version `n + 1`.
-typedef SaveMigration = Map<String, Object?> Function(Map<String, Object?> data);
+typedef SaveMigration = Map<String, Object?> Function(
+  Map<String, Object?> data,
+);
 
 /// A versioned JSON document (game progress, app state) stored under one key.
 ///

@@ -34,7 +34,8 @@ class SharedPrefsStore implements KeyValueStore {
   @override
   int? getInt(String key) => _prefs.getInt(key);
   @override
-  Future<void> setString(String key, String value) => _prefs.setString(key, value);
+  Future<void> setString(String key, String value) =>
+      _prefs.setString(key, value);
   @override
   Future<void> setBool(String key, bool value) => _prefs.setBool(key, value);
   @override
