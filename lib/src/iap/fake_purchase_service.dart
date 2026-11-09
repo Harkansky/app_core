@@ -1,5 +1,7 @@
 import 'dart:ui' show Locale, PlatformDispatcher;
 
+import 'package:flutter/widgets.dart' show WidgetsBinding;
+
 import 'currency.dart';
 import 'purchase_service.dart';
 import 'product_spec.dart';
@@ -28,7 +30,7 @@ class FakePurchaseService extends PurchaseService {
 
   /// Currency the prices are shown in, e.g. 'EUR' on a French device.
   String get currency => currencyForRegion(
-    (_locale ?? PlatformDispatcher.instance.locale).countryCode,
+    (_locale ?? _deviceLocale).countryCode,
     fallback: defaultCurrency,
   );
 
@@ -79,7 +81,7 @@ class FakePurchaseService extends PurchaseService {
   }
 
   String _price(ProductSpec spec) {
-    final locale = (_locale ?? PlatformDispatcher.instance.locale).toString();
+    final locale = (_locale ?? _deviceLocale).toString();
     var code = currency;
     var amount = spec.debugPrices[code];
     if (amount == null) {
@@ -88,5 +90,16 @@ class FakePurchaseService extends PurchaseService {
     }
     if (amount == null) return '';
     return formatPrice(amount, code, locale);
+  }
+
+  /// The device locale, read through Flutter's binding so tests can set it
+  /// (`tester.platformDispatcher.localeTestValue`).
+  static Locale get _deviceLocale {
+    try {
+      return WidgetsBinding.instance.platformDispatcher.locale;
+    } catch (_) {
+      // No Flutter binding yet (plain unit tests): ask the engine directly.
+      return PlatformDispatcher.instance.locale;
+    }
   }
 }
